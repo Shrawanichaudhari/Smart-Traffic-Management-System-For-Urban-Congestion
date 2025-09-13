@@ -60,6 +60,7 @@ docker-compose logs postgres
 ```bash
 # Start the FastAPI application
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 # The API will be available at:
 # - API: http://localhost:8000

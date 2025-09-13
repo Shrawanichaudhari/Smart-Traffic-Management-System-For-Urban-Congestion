@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { trafficApi, LiveMetrics, PerformanceComparison } from "@/service/apiService";
 import { LaneData } from "./TrafficDashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -8,38 +10,70 @@ interface AnalyticsDashboardProps {
 }
 
 export const AnalyticsDashboard = ({ lanes }: AnalyticsDashboardProps) => {
-  // Calculate analytics
-  const totalVehicles = lanes.reduce((sum, lane) => sum + lane.vehicleCount, 0);
-  const avgWaitTime = Math.round(lanes.reduce((sum, lane) => sum + lane.timeRemaining, 0) / lanes.length);
-  const throughputPerHour = Math.round(totalVehicles * 12); // Assuming 5-minute cycles
-  const fuelSaved = Math.round(totalVehicles * 0.2); // Liters saved vs baseline
-  const co2Saved = Math.round(fuelSaved * 2.31); // kg CO2 saved
+  const [liveMetrics, setLiveMetrics] = useState<LiveMetrics | null>(null);
+  const [performance, setPerformance] = useState<PerformanceComparison | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const [metricsResponse, performanceResponse] = await Promise.all([
+          trafficApi.getLiveMetrics(),
+          trafficApi.getPerformanceComparison()
+        ]);
+
+        setLiveMetrics(metricsResponse.data);
+        setPerformance(performanceResponse.data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+        setError('Failed to fetch analytics data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+    // Fetch data every 2 seconds for real-time updates
+    const interval = setInterval(fetchAnalytics, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
+    return <div className="p-4 text-center">Loading analytics...</div>;
+  }
+
+  if (error) {
+    return <div className="p-4 text-center text-destructive">{error}</div>;
+  }
 
   const metrics = [
     {
       title: "Current Throughput",
-      value: `${throughputPerHour}/hr`,
+      value: `${performance?.comparison.comparison_data?.ai_mode?.avg_throughput || 0}/hr`,
       icon: <TrendingUp className="w-4 h-4" />,
-      change: "+12%",
+      change: `${((performance?.comparison.comparison_data?.ai_mode?.avg_throughput || 0) - (performance?.comparison.comparison_data?.baseline_mode?.avg_throughput || 0)).toFixed(1)}%`,
       positive: true
     },
     {
       title: "Avg Wait Time",
-      value: `${avgWaitTime}s`,
+      value: `${liveMetrics?.wait_times.overall_avg_wait_time.toFixed(1)}s`,
       icon: <Clock className="w-4 h-4" />,
-      change: "-8%",
-      positive: true
+      change: `-${Math.abs((liveMetrics?.wait_times.overall_avg_wait_time || 0) - 45).toFixed(1)}%`,
+      positive: (liveMetrics?.wait_times.overall_avg_wait_time || 0) < 45
     },
     {
       title: "Fuel Saved",
-      value: `${fuelSaved}L`,
+      value: `${liveMetrics?.environmental_impact.total_fuel_saved.toFixed(1)}L`,
       icon: <Fuel className="w-4 h-4" />,
       change: "+15%",
       positive: true
     },
     {
       title: "CO₂ Reduced",
-      value: `${co2Saved}kg`,
+      value: `${liveMetrics?.environmental_impact.total_co2_saved.toFixed(1)}kg`,
       icon: <Leaf className="w-4 h-4" />,
       change: "+15%",
       positive: true
@@ -71,9 +105,7 @@ export const AnalyticsDashboard = ({ lanes }: AnalyticsDashboardProps) => {
                   <div className="text-lg font-semibold text-foreground">{metric.value}</div>
                 </div>
               </div>
-              <div className={`text-sm font-medium ${
-                metric.positive ? "text-success" : "text-destructive"
-              }`}>
+              <div className={`text-sm font-medium ${metric.positive ? "text-success" : "text-destructive"}`}>
                 {metric.change}
               </div>
             </div>
@@ -119,7 +151,7 @@ export const AnalyticsDashboard = ({ lanes }: AnalyticsDashboardProps) => {
               <div className="text-xs text-muted-foreground">Uptime</div>
             </div>
             <div className="text-center p-3 rounded-lg bg-primary/20">
-              <div className="text-2xl font-bold text-primary">{totalVehicles}</div>
+              <div className="text-2xl font-bold text-primary">{lanes.reduce((sum, lane) => sum + lane.vehicleCount, 0)}</div>
               <div className="text-xs text-muted-foreground">Active Vehicles</div>
             </div>
           </div>
