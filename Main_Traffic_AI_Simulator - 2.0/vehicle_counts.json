@@ -1,0 +1,6 @@
+{
+    "right": {"car": 25, "bus": 12, "truck":10, "bike": 35},
+    "down": {"car": 20, "bus":12, "truck": 6, "bike": 20},
+    "left": {"car": 10, "bus": 6, "truck": 16, "bike": 11},
+    "up": {"car": 33, "bus": 13, "truck": 5, "bike": 40}
+}

@@ -1,0 +1,71 @@
+{
+  "simulation_id": "SIM_001",
+  "timestamp": "2025-12-14T18:51:24.628153Z",
+  "intersection_id": "INT_001",
+  "current_phase": {
+    "phase_id": 1,
+    "active_directions": [
+      "south",
+      "north"
+    ],
+    "status": "GREEN",
+    "remaining_time": 3
+  },
+  "direction_metrics": {
+    "east": {
+      "vehicle_counts": {
+        "car": 0,
+        "bus": 0,
+        "truck": 0,
+        "bike": 0
+      },
+      "queue_length": 0,
+      "vehicles_crossed": 0,
+      "avg_wait_time": 56.6,
+      "emergency_vehicle_present": false
+    },
+    "south": {
+      "vehicle_counts": {
+        "car": 0,
+        "bus": 0,
+        "truck": 0,
+        "bike": 0
+      },
+      "queue_length": 0,
+      "vehicles_crossed": 0,
+      "avg_wait_time": 39.6,
+      "emergency_vehicle_present": false
+    },
+    "west": {
+      "vehicle_counts": {
+        "car": 0,
+        "bus": 0,
+        "truck": 0,
+        "bike": 0
+      },
+      "queue_length": 0,
+      "vehicles_crossed": 0,
+      "avg_wait_time": 48.9,
+      "emergency_vehicle_present": false
+    },
+    "north": {
+      "vehicle_counts": {
+        "car": 0,
+        "bus": 0,
+        "truck": 0,
+        "bike": 1
+      },
+      "queue_length": 1,
+      "vehicles_crossed": 0,
+      "avg_wait_time": 45.8,
+      "emergency_vehicle_present": false
+    }
+  },
+  "overall_metrics": {
+    "total_vehicles_passed": 273,
+    "avg_wait_time_all_sides": 48.2,
+    "throughput": 121.91,
+    "avg_speed": 2.2,
+    "cycle_time": 2.0
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "right": {
+    "car": 25,
+    "bus": 1,
+    "truck": 1
+  },
+  "down": {
+    "bus": 3,
+    "car": 13
+  },
+  "left": {
+    "car": 23,
+    "bus": 7
+  },
+  "up": {
+    "car": 30,
+    "truck": 1
+  }
+}

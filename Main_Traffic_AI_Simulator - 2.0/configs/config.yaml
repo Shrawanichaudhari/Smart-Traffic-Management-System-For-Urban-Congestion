@@ -1,0 +1,88 @@
+# Vehicle Detection and Tracking Configuration
+
+# YOLO Model Settings (Ultralytics compatible)
+model_path: "yolov8n.pt"  # Will auto-download if not found
+conf_threshold: 0.3       # Lowered to catch more detections      # Confidence threshold for detections
+iou_threshold: 0.45      # IoU threshold for NMS
+
+# Class Mapping: COCO classes -> Vehicle types
+# Map original YOLO classes to desired vehicle categories
+class_mapping:
+  car: "car"
+  motorbike: "bike"  
+  motorcycle: "bike"  # Alternative name
+  bus: "bus"
+  truck: "truck"
+  bicycle: "bike"
+  bike: "bike"          # Alternative name
+  train: "train"
+  # If you have custom trained model with emergency vehicles:
+  ambulance: "ambulance"
+  fire_truck: "fire_truck"
+  # Fallback mappings for emergency detection:
+  # truck: "ambulance"     # Uncomment if truck class should be treated as ambulance
+
+# Emergency Vehicle Detection
+emergency_labels:
+  - "ambulance"
+  - "fire_truck"
+
+# Color-based emergency detection (fallback heuristic)
+# Threshold for red/blue pixel ratio in top 20% of vehicle bbox
+emergency_color_threshold: 0.15  # 15% of pixels must be emergency colors
+
+# Tracking Parameters
+max_lost_frames: 15              # Frames before track expires (reduced for better tracking)
+distance_threshold_ratio: 0.3    # Matching distance as ratio of bbox max dimension (more strict)
+frame_buffer_size: 10           # Number of previous frames to keep for matching
+
+# Processing Options
+max_detection_per_frame: 50     # Maximum detections to process per frame
+min_bbox_area: 100              # Minimum bbox area to consider valid detection
+
+# Output Settings
+save_annotated_frames: false    # Save annotated frames (memory intensive)
+output_formats:
+  - "json"
+  - "csv"
+
+# Display Settings (for --show option)
+display_settings:
+  emergency_color: [0, 0, 255]   # BGR color for emergency vehicles (red)
+  normal_color: [0, 255, 0]      # BGR color for normal vehicles (green)
+  thickness_emergency: 3         # Box thickness for emergency vehicles
+  thickness_normal: 2            # Box thickness for normal vehicles
+  font_scale: 0.5               # Text font scale
+  show_track_ids: true          # Show track IDs in display
+  show_confidence: false        # Show confidence scores in display
+
+# Advanced Settings
+detection_filters:
+  min_confidence: 0.3           # Minimum confidence to consider
+  min_width: 20                 # Minimum bbox width
+  min_height: 20                # Minimum bbox height
+  max_width: 1000               # Maximum bbox width (filter out noise)
+  max_height: 1000              # Maximum bbox height
+
+# Emergency Color Detection (HSV ranges)
+emergency_color_hsv:
+  red_ranges:
+    - lower: [0, 100, 100]      # Red range 1 (lower bound)
+      upper: [10, 255, 255]     # Red range 1 (upper bound)
+    - lower: [160, 100, 100]    # Red range 2 (HSV wrap-around)
+      upper: [180, 255, 255]    # Red range 2 (upper bound)
+  blue_ranges:
+    - lower: [100, 100, 100]    # Blue range
+      upper: [130, 255, 255]    # Blue range
+  analysis_region: 0.2          # Top fraction of bbox to analyze (0.2 = top 20%)
+
+# Performance Settings
+batch_processing: false         # Process frames in batches (experimental)
+use_gpu: true                  # Use GPU if available
+num_workers: 1                 # Number of worker threads
+memory_limit_mb: 2048          # Memory limit in MB
+
+# Debug Settings
+debug_mode: false              # Enable debug output
+save_debug_images: false       # Save debug images with color analysis
+log_level: "INFO"              # Logging level: DEBUG, INFO, WARNING, ERROR
